@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:music_player/core/theme/app_theme.dart';
-import 'package:music_player/presentation/bloc/playlist_bloc.dart';
+import 'package:music_player/presentation/bloc/playlist_bloc/playlist_bloc.dart';
 import 'package:music_player/presentation/pages/playlist_detail_page.dart';
 
 class PlaylistsPage extends StatefulWidget {

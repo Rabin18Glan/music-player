@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:music_player/core/theme/app_theme.dart';
-import 'package:music_player/presentation/bloc/audio_bloc.dart';
+import 'package:music_player/presentation/bloc/audio_bloc/audio_bloc.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
 class PlayerControls extends StatelessWidget {
@@ -11,7 +11,7 @@ class PlayerControls extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       builder: (context, state) {
-        if (state is AudioPlaying) {
+        if (state is AudioLoaded) {
           return Column(
             children: [
               // Progress bar
@@ -21,11 +21,9 @@ class PlayerControls extends StatelessWidget {
                   children: [
                     ProgressBar(
                       progress: state.position,
-                      total: Duration(minutes: state.currentSong.duration??3),
+                      total: Duration(minutes: state.currentSong.duration ?? 3),
                       onSeek: (position) {
-                        context.read<AudioBloc>().add(
-                              SeekToPosition(position),
-                            );
+                        context.read<AudioBloc>().add(SeekToPosition(position));
                       },
                       thumbColor: AppTheme.primaryColor,
                       progressBarColor: AppTheme.primaryColor,
@@ -33,16 +31,18 @@ class PlayerControls extends StatelessWidget {
                       thumbRadius: 8,
                       barHeight: 4,
                       timeLabelTextStyle: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withOpacity(0.7),
                         fontSize: 12,
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Control buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +98,7 @@ class PlayerControls extends StatelessWidget {
             ],
           );
         }
-        
+
         return const SizedBox.shrink();
       },
     );

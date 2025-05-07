@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:music_player/core/theme/app_theme.dart';
-import 'package:music_player/presentation/bloc/audio_bloc.dart';
-import 'package:music_player/presentation/bloc/favorites_bloc.dart';
+import 'package:music_player/presentation/bloc/audio_bloc/audio_bloc.dart';
+import 'package:music_player/presentation/bloc/favorites_bloc/favorites_bloc.dart';
 import 'package:music_player/presentation/widgets/song_tile.dart';
 
 class FavoritesPage extends StatelessWidget {
@@ -56,7 +56,7 @@ class FavoritesPage extends StatelessWidget {
                 return BlocBuilder<AudioBloc, AudioState>(
                   builder: (context, audioState) {
                     final isPlaying =
-                        audioState is AudioPlaying &&
+                        audioState is AudioLoaded &&
                         audioState.currentSong.id == song.id &&
                         audioState.isPlaying;
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:music_player/presentation/bloc/audio_bloc.dart';
-import 'package:music_player/presentation/bloc/favorites_bloc.dart';
+import 'package:music_player/presentation/bloc/audio_bloc/audio_bloc.dart';
+import 'package:music_player/presentation/bloc/favorites_bloc/favorites_bloc.dart';
 import 'package:music_player/presentation/widgets/song_tile.dart';
 import 'package:music_player/presentation/widgets/empty_music_view.dart';
 
@@ -13,9 +13,7 @@ class SongsPage extends StatelessWidget {
     return BlocBuilder<AudioBloc, AudioState>(
       builder: (context, audioState) {
         if (audioState is AudioLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         } else if (audioState is AudioLoaded) {
           if (audioState.songs.isEmpty) {
             return EmptyMusicView(
@@ -24,87 +22,25 @@ class SongsPage extends StatelessWidget {
               },
             );
           }
-          
-          return BlocBuilder<FavoritesBloc, FavoritesState>(
-            builder: (context, favoritesState) {
-              final favorites = favoritesState is FavoritesLoaded 
-                  ? favoritesState.favorites 
-                  : [];
-              
-              return ListView.builder(
-                padding: const EdgeInsets.only(bottom: 80), // Space for mini player
-                itemCount: audioState.songs.length,
-                itemBuilder: (context, index) {
-                  final song = audioState.songs[index];
-                  final isFavorite = favorites.any((fav) => fav.id == song.id);
-                  
-                  return SongTile(
-                    song: song,
-                    isPlaying: false,
-                    isFavorite: isFavorite,
-                  );
-                },
-              );
-            },
-          );
-        } else if (audioState is AudioPlaying) {
-          return BlocBuilder<AudioBloc, AudioState>(
-            builder: (context, state) {
-              if (state is AudioLoaded) {
-                if (state.songs.isEmpty) {
-                  return EmptyMusicView(
-                    onRefresh: () {
-                      context.read<AudioBloc>().add(LoadAudioFiles());
-                    },
-                  );
-                }
-                
-                return BlocBuilder<FavoritesBloc, FavoritesState>(
-                  builder: (context, favoritesState) {
-                    final favorites = favoritesState is FavoritesLoaded 
-                        ? favoritesState.favorites 
-                        : [];
-                    
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      itemCount: state.songs.length,
-                      itemBuilder: (context, index) {
-                        final song = state.songs[index];
-                        final isPlaying = audioState.currentSong.id == song.id && 
-                            audioState.isPlaying;
-                        final isFavorite = favorites.any((fav) => fav.id == song.id);
-                        
-                        return SongTile(
-                          song: song,
-                          isPlaying: isPlaying,
-                          isFavorite: isFavorite,
-                        );
-                      },
-                    );
-                  },
-                );
-              }
-              
-              // Fallback to showing just the current playing song
-              return BlocBuilder<FavoritesBloc, FavoritesState>(
-                builder: (context, favoritesState) {
-                  final favorites = favoritesState is FavoritesLoaded 
-                      ? favoritesState.favorites 
-                      : [];
-                  
-                  final isFavorite = favorites.any((fav) => fav.id == audioState.currentSong.id);
-                  
-                  return ListView(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    children: [
-                      SongTile(
-                        song: audioState.currentSong,
-                        isPlaying: audioState.isPlaying,
-                        isFavorite: isFavorite,
-                      ),
-                    ],
-                  );
-                },
+
+          final favoritesBloc = context.watch<FavoritesBloc>();
+          final favoritesState = favoritesBloc.state;
+          final favorites =
+              favoritesState is FavoritesLoaded ? favoritesState.favorites : [];
+
+          return ListView.builder(
+            padding: const EdgeInsets.only(bottom: 80), // Space for mini player
+            itemCount: audioState.songs.length,
+            itemBuilder: (context, index) {
+              final song = audioState.songs[index];
+              final isPlaying =
+                  audioState.currentSong.id == song.id && audioState.isPlaying;
+              final isFavorite = favorites.any((fav) => fav.id == song.id);
+
+              return SongTile(
+                song: song,
+                isPlaying: isPlaying,
+                isFavorite: isFavorite,
               );
             },
           );

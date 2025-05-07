@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:music_player/core/theme/app_theme.dart';
 import 'package:music_player/data/datasources/audio_local_data_source.dart';
 import 'package:music_player/data/repositories/audio_repository_impl.dart';
-import 'package:music_player/presentation/bloc/audio_bloc.dart';
-import 'package:music_player/presentation/bloc/favorites_bloc.dart';
-import 'package:music_player/presentation/bloc/playlist_bloc.dart';
+import 'package:music_player/presentation/bloc/audio_bloc/audio_bloc.dart';
+import 'package:music_player/presentation/bloc/favorites_bloc/favorites_bloc.dart';
+import 'package:music_player/presentation/bloc/playlist_bloc/playlist_bloc.dart';
 import 'package:music_player/presentation/pages/home_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<FavoritesBloc>(create: (context) => FavoritesBloc()),
       ],
       child: MaterialApp(
-        title: 'Harmony Music Player',
+        title: 'Music Player',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,

@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:music_player/core/theme/app_theme.dart';
-import 'package:music_player/presentation/bloc/audio_bloc.dart';
-import 'package:music_player/presentation/bloc/favorites_bloc.dart';
-import 'package:music_player/presentation/bloc/playlist_bloc.dart';
-import 'package:music_player/presentation/widgets/audio_visualizer.dart';
+import 'package:music_player/presentation/bloc/audio_bloc/audio_bloc.dart';
+import 'package:music_player/presentation/bloc/favorites_bloc/favorites_bloc.dart';
+import 'package:music_player/presentation/bloc/playlist_bloc/playlist_bloc.dart';
+
 import 'package:music_player/presentation/widgets/player_controls.dart';
 
 class NowPlayingPage extends StatelessWidget {
@@ -36,20 +36,11 @@ class NowPlayingPage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: BlocBuilder<AudioBloc, AudioState>(
         builder: (context, state) {
-          if (state is AudioPlaying) {
+          if (state is AudioLoaded) {
             return Container(
               width: double.infinity,
               height: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppTheme.backgroundColor,
-                    AppTheme.backgroundColor.withOpacity(0.8),
-                  ],
-                ),
-              ),
+              decoration: BoxDecoration(gradient: AppTheme.surfaceGradient),
               child: SafeArea(
                 child: Column(
                   children: [
@@ -98,9 +89,7 @@ class NowPlayingPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // Audio visualizer
-                    const AudioVisualizer(),
-
+                    
                     const Spacer(),
 
                     // Song info
@@ -113,6 +102,7 @@ class NowPlayingPage extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
+                              color: AppTheme.textColor,
                             ),
                             textAlign: TextAlign.center,
                             maxLines: 1,
@@ -123,9 +113,7 @@ class NowPlayingPage extends StatelessWidget {
                             '${state.currentSong.artist} • ${state.currentSong.album}',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                              color: AppTheme.secondaryTextColor,
                             ),
                             textAlign: TextAlign.center,
                             maxLines: 1,
@@ -164,8 +152,7 @@ class NowPlayingPage extends StatelessWidget {
                                   isFavorite
                                       ? Icons.favorite
                                       : Icons.favorite_border,
-                                  color:
-                                      isFavorite ? AppTheme.primaryColor : null,
+                                  color: AppTheme.accentColor,
                                   size: 30,
                                 ),
                                 onPressed: () {
@@ -200,25 +187,47 @@ class NowPlayingPage extends StatelessWidget {
                 ),
               ),
             );
+          } else if (state is AudioError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error,
+                    size: 80,
+                    color: AppTheme.primaryColor.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.music_off,
+                    size: 80,
+                    color: AppTheme.primaryColor.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No song playing',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            );
           }
-
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.music_off,
-                  size: 80,
-                  color: AppTheme.primaryColor.withOpacity(0.5),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'No song playing',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          );
         },
       ),
     );
@@ -296,7 +305,7 @@ class NowPlayingPage extends StatelessWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('Added to $playlistName'),
-                                  backgroundColor: AppTheme.primaryColor,
+                                  backgroundColor: AppTheme.surfaceColor,
                                 ),
                               );
                             },
